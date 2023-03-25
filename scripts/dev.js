@@ -4,7 +4,4 @@ import { setCwd } from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
 setCwd();
 Deno.chdir("..");
 
-await generateTypes({
-	outputDir: ".denoTypes",
-	importMap: "importmap.json",
-});
+await generateTypes();

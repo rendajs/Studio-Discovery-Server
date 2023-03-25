@@ -11,7 +11,7 @@ export class WebSocketManager {
 
 	/**
 	 * @param {Request} request
-	 * @param {import("std/http/server.ts").ConnInfo} connInfo
+	 * @param {import("https://deno.land/std@0.181.0/http/server.ts").ConnInfo} connInfo
 	 */
 	handleRequest(request, connInfo) {
 		const { socket, response } = Deno.upgradeWebSocket(request);
