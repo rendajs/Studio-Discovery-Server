@@ -10,6 +10,9 @@ this server also facilitates the messaging required for setting up the WebRTC co
 
 At the moment no stun/turn functionality is included. So for now the clients that can connect to each other are rather limited.
 But it should at least be possible to connect two browsers on the same device.
+Depending on your network configuration, you might also be able connect two devices on the same network.
+The discovery server only lists other clients that have the same ip as yours, so for now stun/turn is not really needed.
+But when rooms are added with the possibility to connect users over longer distances, at least stun would be required.
 
 ## Running the server
 
