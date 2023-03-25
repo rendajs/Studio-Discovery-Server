@@ -1,0 +1,14 @@
+{
+	"extends": "./.denoTypes/tsconfig.json",
+	"compilerOptions": {
+		"lib": ["dom", "dom.iterable", "esnext", "WebWorker"],
+		"target": "esnext",
+		"checkJs": true,
+		"module": "esnext",
+		"strict": true
+	},
+	"include": [
+		"src/**/*.js",
+		"src/**/*.ts"
+	]
+}

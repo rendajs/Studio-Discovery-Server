@@ -26,3 +26,7 @@ then this repository should be located at `~/Documents/repositories/studio-disco
 
 When this repository has not been cloned, the discovery server will still be started from the dev script,
 it will just be imported from raw.githubusercontent.com directly as opposed to from the local file system.
+
+## Type checking
+
+Run `deno task dev` to generate the type files to get correct type checking in your IDE.

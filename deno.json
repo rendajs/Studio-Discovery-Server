@@ -6,5 +6,9 @@
 			"lineWidth": 250,
 			"proseWrap": "preserve"
 		}
-	}
+	},
+	"tasks": {
+		"dev": "deno run -A scripts/dev.js"
+	},
+	"importMap": "importmap.json"
 }
