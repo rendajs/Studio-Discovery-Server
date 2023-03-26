@@ -18,7 +18,8 @@ export class WebSocketManager {
 		if (connInfo.remoteAddr.transport != "tcp" && connInfo.remoteAddr.transport != "udp") {
 			throw new Error("Invalid connection type");
 		}
-		const remoteAddress = connInfo.remoteAddr.hostname;
+		const cfConnectingIp = request.headers.get("cf-connecting-ip");
+		const remoteAddress = cfConnectingIp || connInfo.remoteAddr.hostname;
 		const connection = new WebSocketConnection(this, remoteAddress, socket);
 		this.activeConnections.set(connection.id, connection);
 
