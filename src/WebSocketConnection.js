@@ -1,24 +1,34 @@
 import { generateUuid } from "https://raw.githubusercontent.com/rendajs/Renda/7adb3535329160690dbc6c136eca6327e9082c73/src/util/util.js";
 
 export class WebSocketConnection {
+	#webSocketManager;
+	#remoteAddress;
+	#id;
+	get id() {
+		return this.#id;
+	}
+	#rawConnection;
+
+	get clientType() {
+		return "studio"; // todo: support for setting this from client
+	}
+	#projectMetaData = null;
+
+	#firstIsHostMessageReceived = false;
+	#isStudioHost = false;
+
 	/**
 	 * @param {import("./WebSocketManager.js").WebSocketManager} webSocketManager
 	 * @param {string} remoteAddress
 	 * @param {WebSocket} rawConnection
 	 */
 	constructor(webSocketManager, remoteAddress, rawConnection) {
-		this.webSocketManager = webSocketManager;
-		this.remoteAddress = remoteAddress;
-		this.id = generateUuid();
-		this.clientType = "studio"; // todo: support for setting this from client
-		this.projectMetaData = null;
-		this.rawConnection = rawConnection;
+		this.#webSocketManager = webSocketManager;
+		this.#remoteAddress = remoteAddress;
+		this.#id = generateUuid();
+		this.#rawConnection = rawConnection;
 
-		this.firstIsHostMessageReceived = false;
-		this.isStudioHost = false;
-		this.isDiscovering = false;
-
-		this.rawConnection.addEventListener("message", this.onMessage.bind(this));
+		this.#rawConnection.addEventListener("message", this.onMessage.bind(this));
 	}
 
 	/**
@@ -38,29 +48,29 @@ export class WebSocketConnection {
 
 		if (op == "setIsStudioHost") {
 			const newIsHost = !!data.isHost;
-			if (newIsHost == this.isStudioHost && this.firstIsHostMessageReceived) return;
-			this.isStudioHost = newIsHost;
-			this.firstIsHostMessageReceived = true;
-			if (this.isStudioHost) {
+			if (newIsHost == this.#isStudioHost && this.#firstIsHostMessageReceived) return;
+			this.#isStudioHost = newIsHost;
+			this.#firstIsHostMessageReceived = true;
+			if (this.#isStudioHost) {
 				this.notifyNearbyHostConnectionsAdd();
 			} else {
 				this.sendNearbyHostConnectionsList();
 			}
 		} else if (op == "projectMetaData") {
 			const { projectMetaData } = data;
-			this.projectMetaData = projectMetaData;
+			this.#projectMetaData = projectMetaData;
 			this.notifyNearbyHostConnectionsUpdateProjectMetaData();
 		} else if (op == "relayMessage") {
 			const { toUuid, data: relayData } = data;
 			if (!toUuid || !relayData) return;
-			const toConnection = this.webSocketManager.getConnection(toUuid);
+			const toConnection = this.#webSocketManager.getConnection(toUuid);
 			if (!toConnection) return;
-			toConnection.sendRelayData(this.id, relayData);
+			toConnection.sendRelayData(this.#id, relayData);
 		}
 	}
 
 	onClose() {
-		if (this.isStudioHost) {
+		if (this.#isStudioHost) {
 			this.notifyNearbyHostConnectionsRemove();
 		}
 	}
@@ -69,21 +79,21 @@ export class WebSocketConnection {
 	 * @param {*} data
 	 */
 	send(data) {
-		this.rawConnection.send(JSON.stringify(data));
+		this.#rawConnection.send(JSON.stringify(data));
 	}
 
 	getConnectionData() {
 		return {
-			id: this.id,
+			id: this.#id,
 			clientType: this.clientType,
-			projectMetaData: this.projectMetaData,
+			projectMetaData: this.#projectMetaData,
 		};
 	}
 
 	sendNearbyHostConnectionsList() {
 		const connectionsData = [];
-		for (const connection of this.webSocketManager.getConnectionsByRemoteAddress(this.remoteAddress)) {
-			if (!connection.isStudioHost) continue;
+		for (const connection of this.#webSocketManager.getConnectionsByRemoteAddress(this.#remoteAddress)) {
+			if (!connection.#isStudioHost) continue;
 			connectionsData.push(connection.getConnectionData());
 		}
 		this.send({
@@ -93,24 +103,24 @@ export class WebSocketConnection {
 	}
 
 	notifyNearbyHostConnectionsAdd() {
-		for (const connection of this.webSocketManager.getConnectionsByRemoteAddress(this.remoteAddress)) {
-			if (connection.isStudioHost) continue;
+		for (const connection of this.#webSocketManager.getConnectionsByRemoteAddress(this.#remoteAddress)) {
+			if (connection.#isStudioHost) continue;
 
 			connection.sendNearbyHostConnectionAdded(this);
 		}
 	}
 
 	notifyNearbyHostConnectionsRemove() {
-		for (const connection of this.webSocketManager.getConnectionsByRemoteAddress(this.remoteAddress)) {
-			if (connection.isStudioHost) continue;
+		for (const connection of this.#webSocketManager.getConnectionsByRemoteAddress(this.#remoteAddress)) {
+			if (connection.#isStudioHost) continue;
 
 			connection.sendNearbyHostConnectionRemoved(this);
 		}
 	}
 
 	notifyNearbyHostConnectionsUpdateProjectMetaData() {
-		for (const connection of this.webSocketManager.getConnectionsByRemoteAddress(this.remoteAddress)) {
-			if (connection.isStudioHost) continue;
+		for (const connection of this.#webSocketManager.getConnectionsByRemoteAddress(this.#remoteAddress)) {
+			if (connection.#isStudioHost) continue;
 
 			connection.sendNearbyHostConnectionUpdateProjectMetaData(this);
 		}
@@ -132,7 +142,7 @@ export class WebSocketConnection {
 	sendNearbyHostConnectionRemoved(connection) {
 		this.send({
 			op: "nearbyHostConnectionRemoved",
-			id: connection.id,
+			id: connection.#id,
 		});
 	}
 
@@ -142,8 +152,8 @@ export class WebSocketConnection {
 	sendNearbyHostConnectionUpdateProjectMetaData(connection) {
 		this.send({
 			op: "nearbyHostConnectionUpdateProjectMetaData",
-			id: connection.id,
-			projectMetaData: connection.projectMetaData,
+			id: connection.#id,
+			projectMetaData: connection.#projectMetaData,
 		});
 	}
 
