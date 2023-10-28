@@ -1,13 +1,11 @@
 import { WebSocketConnection } from "./WebSocketConnection.js";
 
 export class WebSocketManager {
-	constructor() {
-		/** @type {Map<string, WebSocketConnection>} */
-		this.activeConnections = new Map();
+	/** @type {Map<string, WebSocketConnection>} */
+	#activeConnections = new Map();
 
-		/** @type {Map<string, Set<WebSocketConnection>>} */
-		this.connectionsByRemoteAddress = new Map();
-	}
+	/** @type {Map<string, Set<WebSocketConnection>>} */
+	#connectionsByRemoteAddress = new Map();
 
 	/**
 	 * @param {Request} request
@@ -18,26 +16,28 @@ export class WebSocketManager {
 		if (connInfo.remoteAddr.transport != "tcp" && connInfo.remoteAddr.transport != "udp") {
 			throw new Error("Invalid connection type");
 		}
+		// We use cf-connecting-ip instead of X-Forwarded-For
+		// because the later could be a list of ips and we're only interested in a single one.
 		const cfConnectingIp = request.headers.get("cf-connecting-ip");
 		const remoteAddress = cfConnectingIp || connInfo.remoteAddr.hostname;
 		const connection = new WebSocketConnection(this, remoteAddress, socket);
-		this.activeConnections.set(connection.id, connection);
+		this.#activeConnections.set(connection.uuid, connection);
 
-		let connections = this.connectionsByRemoteAddress.get(remoteAddress);
+		let connections = this.#connectionsByRemoteAddress.get(remoteAddress);
 		if (!connections) {
 			connections = new Set();
-			this.connectionsByRemoteAddress.set(remoteAddress, connections);
+			this.#connectionsByRemoteAddress.set(remoteAddress, connections);
 		}
 		connections.add(connection);
 
 		socket.addEventListener("close", () => {
 			connection.onClose();
-			this.activeConnections.delete(connection.id);
-			const connections = this.connectionsByRemoteAddress.get(remoteAddress);
+			this.#activeConnections.delete(connection.uuid);
+			const connections = this.#connectionsByRemoteAddress.get(remoteAddress);
 			if (connections) {
 				connections.delete(connection);
 				if (connections.size <= 0) {
-					this.connectionsByRemoteAddress.delete(remoteAddress);
+					this.#connectionsByRemoteAddress.delete(remoteAddress);
 				}
 			}
 		});
@@ -48,7 +48,7 @@ export class WebSocketManager {
 	 * @param {string} remoteAddress
 	 */
 	*getConnectionsByRemoteAddress(remoteAddress) {
-		const connections = this.connectionsByRemoteAddress.get(remoteAddress);
+		const connections = this.#connectionsByRemoteAddress.get(remoteAddress);
 		if (connections) {
 			yield* connections;
 		}
@@ -58,6 +58,6 @@ export class WebSocketManager {
 	 * @param {string} uuid
 	 */
 	getConnection(uuid) {
-		return this.activeConnections.get(uuid);
+		return this.#activeConnections.get(uuid);
 	}
 }
