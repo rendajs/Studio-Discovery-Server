@@ -54,7 +54,8 @@ export class WebSocketConnection {
 	}
 
 	getResponseHandlers() {
-		const disableResponseReturn = /** @satisfies {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/util/TypedMessenger.js").TypedMessengerRequestHandlerReturn} */ {
+		/** @satisfies {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/util/TypedMessenger/TypedMessenger.js").TypedMessengerRequestHandlerReturn} */
+		const disableResponseReturn = {
 			$respondOptions: {
 				respond: false,
 			},

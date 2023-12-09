@@ -10,5 +10,5 @@ await generateTypes({
 		"https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/studio/src/styles/shadowStyles.js",
 		"https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/studio/src/tasks/workers/bundleScripts/bundle.js",
 		"https://raw.githubusercontent.com/rendajs/studio-discovery-server/423fa5d224dae56571a61bfd8d850b76fcdcc6fa/src/WebSocketConnection.js",
-	]
+	],
 });
