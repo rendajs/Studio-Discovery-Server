@@ -1,5 +1,5 @@
-import { generateUuid } from "https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/util/util.js";
-import { TypedMessenger } from "https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/util/TypedMessenger.js";
+import { generateUuid } from "https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/util/util.js";
+import { TypedMessenger } from "https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/util/TypedMessenger/TypedMessenger.js";
 
 /**
  * @typedef {ReturnType<WebSocketConnection["getResponseHandlers"]>} StudioDescoveryResponseHandlers
@@ -13,13 +13,13 @@ export class WebSocketConnection {
 		return this.#uuid;
 	}
 
-	/** @type {TypedMessenger<StudioDescoveryResponseHandlers, import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/discoveryMethods/WebRtcDiscoveryMethod.js").ExternalDiscoveryManagerResponseHandlers>} */
+	/** @type {TypedMessenger<StudioDescoveryResponseHandlers, import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/discoveryMethods/WebRtcDiscoveryMethod.js").ExternalDiscoveryMethodResponseHandlers>} */
 	#messenger;
 
-	/** @type {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/DiscoveryManager.js").ClientType?} */
+	/** @type {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/DiscoveryManager.js").ClientType?} */
 	#clientType = null;
 
-	/** @type {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/DiscoveryManager.js").RemoteStudioMetadata?} */
+	/** @type {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/DiscoveryManager.js").AvailableConnectionProjectMetadata?} */
 	#projectMetadata = null;
 
 	/**
@@ -54,7 +54,7 @@ export class WebSocketConnection {
 	}
 
 	getResponseHandlers() {
-		const disableResponseReturn = /** @satisfies {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/util/TypedMessenger.js").TypedMessengerRequestHandlerReturn} */ {
+		const disableResponseReturn = /** @satisfies {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/util/TypedMessenger.js").TypedMessengerRequestHandlerReturn} */ {
 			$respondOptions: {
 				respond: false,
 			},
@@ -63,7 +63,7 @@ export class WebSocketConnection {
 		return {
 			/**
 			 * Sets the client type of your client.
-			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/DiscoveryManager.js").ClientType} clientType True if the client has an available project.
+			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/DiscoveryManager.js").ClientType} clientType True if the client has an available project.
 			 */
 			registerClient: (clientType) => {
 				if (this.#clientType) {
@@ -74,7 +74,7 @@ export class WebSocketConnection {
 				this.#sendNearbyHostConnectionsList();
 			},
 			/**
-			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/DiscoveryManager.js").RemoteStudioMetadata?} projectMetadata
+			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/DiscoveryManager.js").AvailableConnectionProjectMetadata?} projectMetadata
 			 */
 			setProjectMetadata: (projectMetadata) => {
 				this.#projectMetadata = projectMetadata;
@@ -83,8 +83,8 @@ export class WebSocketConnection {
 			},
 			/**
 			 * Sends arbitrary data to another client that is currently connected.
-			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/util/util.js").UuidString} otherClientUuid
-			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/discoveryMethods/WebRtcDiscoveryMethod.js").ExternalDiscoveryRelayData} data
+			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/util/util.js").UuidString} otherClientUuid
+			 * @param {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/discoveryMethods/WebRtcDiscoveryMethod.js").ExternalDiscoveryRelayData} data
 			 */
 			relayMessage: (otherClientUuid, data) => {
 				if (otherClientUuid && data) {
@@ -104,7 +104,7 @@ export class WebSocketConnection {
 		}
 	}
 
-	/** @returns {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/DiscoveryManager.js").AvailableStudioData?} */
+	/** @returns {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/DiscoveryManager.js").AvailableConnection?} */
 	#getConnectionData() {
 		if (!this.#clientType) return null;
 		return {
@@ -115,7 +115,7 @@ export class WebSocketConnection {
 	}
 
 	#sendNearbyHostConnectionsList() {
-		/** @type {import("https://raw.githubusercontent.com/rendajs/Renda/015df2634a012df1fdd144f059dcdcb17d3aa51e/src/network/studioConnections/DiscoveryManager.js").AvailableStudioData[]} */
+		/** @type {import("https://raw.githubusercontent.com/rendajs/Renda/3570dc24d41ef1522a97371ebdc2e7b88d15317d/src/network/studioConnections/DiscoveryManager.js").AvailableConnection[]} */
 		const connectionsData = [];
 		for (const connection of this.#webSocketManager.getConnectionsByRemoteAddress(this.#remoteAddress)) {
 			if (connection == this) continue;
