@@ -146,7 +146,7 @@ export class WebSocketConnection {
 
 	#notifyNearbyHostConnectionsUpdateProjectMetadata() {
 		for (const connection of this.#webSocketManager.getConnectionsByRemoteAddress(this.#remoteAddress)) {
-			if (connection.#clientType) continue;
+			if (connection == this) continue;
 
 			connection.#messenger.send.setConnectionProjectMetadata(this.#uuid, this.#projectMetadata);
 		}
